@@ -1,0 +1,21 @@
+import Foundation
+
+enum JSONParsingError: Error {
+    case decodingError
+    case invalidData
+}
+
+func parseJSON<T: Decodable>(_ data: Data,
+                             as type: T.Type,
+                             decoderConfig: ((JSONDecoder) -> Void)? = nil) throws -> T {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoderConfig?(decoder) // Apply custom decoder configurations if provided
+
+    do {
+        return try decoder.decode(type, from: data)
+    } catch {
+        print("Error decoding JSON:", error.localizedDescription)
+        throw JSONParsingError.decodingError
+    }
+}
