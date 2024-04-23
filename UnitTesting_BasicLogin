@@ -1,0 +1,43 @@
+import XCTest
+@testable import YourAppName // Import your app module
+
+class LoginTests: XCTestCase {
+    var loginViewController: LoginViewController!
+
+    override func setUpWithError() throws {
+        loginViewController = LoginViewController()
+        // Load the view hierarchy from the storyboard or initialize programmatically if needed
+        // Example: loginViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController
+        loginViewController.loadViewIfNeeded()
+    }
+
+    override func tearDownWithError() throws {
+        loginViewController = nil
+    }
+
+    func testLoginWithValidCredentials() throws {
+        // Set up test data (valid credentials)
+        loginViewController.usernameTextField.text = "testuser"
+        loginViewController.passwordTextField.text = "testpassword"
+
+        // Simulate login button tap
+        loginViewController.loginButtonTapped(UIButton())
+
+        // Validate that the login was successful (e.g., navigate to home screen)
+        XCTAssertTrue(loginViewController.navigationController?.topViewController is HomeViewController)
+    }
+
+    func testLoginWithInvalidCredentials() throws {
+        // Set up test data (invalid credentials)
+        loginViewController.usernameTextField.text = "invaliduser"
+        loginViewController.passwordTextField.text = "invalidpassword"
+
+        // Simulate login button tap
+        loginViewController.loginButtonTapped(UIButton())
+
+        // Validate that an error message is displayed
+        XCTAssertFalse(loginViewController.errorLabel.isHidden)
+    }
+
+    // Add more test cases as needed (e.g., testing edge cases, UI validations, etc.)
+}
