@@ -1,0 +1,52 @@
+import CommonCrypto
+
+
+func encryptAES(data: Data, key: Data, iv: Data) throws -> Data? {
+    let bufferSize = data.count + kCCBlockSizeAES128
+    var buffer = [UInt8](repeating: 0, count: bufferSize)
+
+    var numBytesEncrypted = 0
+    let cryptStatus = key.withUnsafeBytes { keyBytes -> CCCryptorStatus in
+        iv.withUnsafeBytes { ivBytes -> CCCryptorStatus in
+            data.withUnsafeBytes { dataBytes -> CCCryptorStatus in
+                CCCrypt(CCOperation(kCCEncrypt),
+                        CCAlgorithm(kCCAlgorithmAES),
+                        CCOptions(kCCOptionPKCS7Padding),
+                        keyBytes.baseAddress, key.count,
+                        ivBytes.baseAddress,
+                        dataBytes.baseAddress, data.count,
+                        &buffer, bufferSize,
+                        &numBytesEncrypted)
+            }
+        }
+    }
+
+    guard cryptStatus == kCCSuccess else {
+        throw NSError(domain: "EncryptionError", code: Int(cryptStatus), userInfo: nil)
+    }
+
+    return Data(bytes: buffer, count: numBytesEncrypted)
+}
+
+
+
+// USAGE 
+
+let plaintext = "Hello, world!"
+let keyString = "12345678901234567890123456789012" // 32-byte key for AES-256
+let ivString = "abcdefghijklmnop" // 16-byte IV for AES-128
+
+guard let data = plaintext.data(using: .utf8),
+      let key = keyString.data(using: .utf8),
+      let iv = ivString.data(using: .utf8) else {
+    print("Error converting string to data")
+    return
+}
+
+do {
+    let encryptedData = try encryptAES(data: data, key: key, iv: iv)
+    let encryptedString = encryptedData.base64EncodedString()
+    print("Encrypted string:", encryptedString)
+} catch {
+    print("Encryption error:", error.localizedDescription)
+}
