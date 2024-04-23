@@ -1,0 +1,48 @@
+import UIKit
+
+class YourViewController: UIViewController, UISearchBarDelegate, UISearchResultsUpdating {
+    @IBOutlet weak var tableView: UITableView! // Your table view
+
+    let searchController = UISearchController(searchResultsController: nil)
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+
+        searchController.searchBar.delegate = self
+    }
+
+    // Implement UISearchResultsUpdating protocol method
+    func updateSearchResults(for searchController: UISearchController) {
+        // Filter your data based on the search text
+        // Update your table view or collection view with filtered results
+    }
+
+    // Implement UISearchBarDelegate method if needed
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        // Perform search action here if needed
+    }
+}
+
+
+
+// USAGE
+
+class YourViewController: UIViewController, UISearchBarDelegate, UISearchResultsUpdating {
+    var data = ["Apple", "Banana", "Cherry", "Date"]
+    var filteredData: [String] = []
+
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text else { return }
+
+        filteredData = data.filter { $0.localizedCaseInsensitiveContains(searchText) }
+        tableView.reloadData()
+    }
+
+    // Implement other methods as shown in the previous code snippet
+}
