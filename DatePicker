@@ -1,0 +1,57 @@
+import UIKit
+
+class YourViewController: UIViewController {
+
+    let datePicker = UIDatePicker()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Configure date picker
+        datePicker.datePickerMode = .date // Set the mode as date, time, or both
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+
+        // Add date picker to the view
+        view.addSubview(datePicker)
+
+        // Position and size the date picker (using Auto Layout or frame-based layout)
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+        datePicker.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        datePicker.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy" // Customize date format as needed
+        let selectedDate = dateFormatter.string(from: sender.date)
+        print("Selected Date:", selectedDate)
+    }
+}
+
+
+Handle Date Picker Value Changes:
+Implement a method to handle date picker value changes using the .valueChanged event.
+
+
+@objc func datePickerValueChanged(_ sender: UIDatePicker) {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MM/dd/yyyy" // Customize date format as needed
+    let selectedDate = dateFormatter.string(from: sender.date)
+    print("Selected Date:", selectedDate)
+}
+Customize Date Picker Properties:
+You can customize various properties of the date picker, such as date format, minimum and maximum dates, locale, and time zone.
+
+
+datePicker.datePickerMode = .dateAndTime // Example of setting mode to date and time
+datePicker.minimumDate = Date() // Set minimum date
+datePicker.maximumDate = Calendar.current.date(byAdding: .year, value: 1, to: Date()) // Set maximum date (1 year from current date)
+datePicker.locale = Locale(identifier: "en_US") // Set locale
+datePicker.timeZone = TimeZone.current // Set time zone
+Accessing the Selected Date:
+You can access the selected date in the datePickerValueChanged method using sender.date.
+
+
+
+let selectedDate = sender.date
+print("Selected Date:", selectedDate)
