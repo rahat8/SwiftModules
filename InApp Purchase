@@ -1,0 +1,82 @@
+Set Up In-App Purchase in App Store Connect:
+Before implementing in-app purchases in your app, you need to set them up in App Store Connect. This includes creating products (such as consumables, non-consumables, subscriptions), setting prices, and configuring tax and availability details.
+
+Import StoreKit:
+Import the StoreKit framework in your Swift file to access in-app purchase functionalities:
+
+
+import StoreKit
+Request Products from App Store:
+Use SKProductsRequest to request product information from the App Store for the in-app purchases you've set up:
+
+class YourViewController: UIViewController, SKProductsRequestDelegate {
+    let productIdentifiers: Set<String> = ["your_product_id_1", "your_product_id_2"]
+    var productsRequest: SKProductsRequest?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        requestProducts()
+    }
+
+    func requestProducts() {
+        productsRequest = SKProductsRequest(productIdentifiers: productIdentifiers)
+        productsRequest?.delegate = self
+        productsRequest?.start()
+    }
+
+    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        for product in response.products {
+            print("Product ID: \(product.productIdentifier), Title: \(product.localizedTitle), Price: \(product.price)")
+        }
+    }
+}
+
+Implement Purchase Flow:
+Once you have the product information, implement the purchase flow when the user decides to buy a product:
+
+
+class YourViewController: UIViewController, SKPaymentTransactionObserver {
+    // Inside viewDidLoad or another appropriate place
+    SKPaymentQueue.default().add(self) // Add observer for payment transactions
+
+    func purchaseProduct(with productIdentifier: String) {
+        if SKPaymentQueue.canMakePayments() {
+            let payment = SKPayment(product: product)
+            SKPaymentQueue.default().add(payment)
+        } else {
+            print("In-app purchases are not allowed on this device.")
+        }
+    }
+
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+        for transaction in transactions {
+            switch transaction.transactionState {
+            case .purchased:
+                // Handle successful purchase
+                SKPaymentQueue.default().finishTransaction(transaction)
+            case .failed:
+                // Handle failed purchase
+                SKPaymentQueue.default().finishTransaction(transaction)
+            case .restored:
+                // Handle restored purchase
+                SKPaymentQueue.default().finishTransaction(transaction)
+            case .deferred:
+                // Handle deferred purchase (e.g., parental control restrictions)
+                break
+            case .purchasing:
+                // Transaction is in progress
+                break
+            @unknown default:
+                fatalError("Unknown transaction state")
+            }
+        }
+    }
+}
+
+
+Handle Transactions and Provide Content:
+Implement the SKPaymentTransactionObserver protocol to handle payment transactions and provide content to users based on their purchases.
+
+
+Test in Sandbox Environment:
+Before releasing your app, test in-app purchases in the sandbox environment to ensure everything works as expected.
