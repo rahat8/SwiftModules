@@ -1,0 +1,44 @@
+//initial setup
+Set Up Your Project with Google Developer Console:
+Go to the Google Developer Console (https://console.developers.google.com/).
+Create a new project or select an existing one.
+Enable the Google Sign-In API for your project.
+Generate OAuth 2.0 client IDs for iOS apps, providing your app's bundle identifier.
+Install GoogleSignIn SDK:
+You can use CocoaPods or manually add the SDK to your project.
+If using CocoaPods, add pod 'GoogleSignIn' to your Podfile and run pod install.
+Configure Your Xcode Project:
+Open your Xcode project.
+In your project settings, add the URL schemes for Google Sign-In. This is usually in the format com.googleusercontent.apps.{your-client-id}.
+Import GoogleSignIn in Your Code:
+Import the GoogleSignIn framework in your Swift file where you want to use Google Sign-In.
+
+
+import UIKit
+import GoogleSignIn
+
+class ViewController: UIViewController, GIDSignInDelegate {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        GIDSignIn.sharedInstance().clientID = "YOUR_CLIENT_ID_FROM_GOOGLE_CONSOLE"
+        GIDSignIn.sharedInstance().delegate = self
+    }
+
+    // Handle Google Sign-In Button Pressed
+    @IBAction func googleSignInButtonPressed(_ sender: UIButton) {
+        GIDSignIn.sharedInstance().presentingViewController = self
+        GIDSignIn.sharedInstance().signIn()
+    }
+
+    // MARK: - GIDSignInDelegate
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error {
+            print("Google Sign-In error: \(error.localizedDescription)")
+            return
+        }
+
+        // You can access user details like user.userID, user.profile.name, user.profile.email, etc.
+        print("Google Sign-In successful! User ID: \(user.userID ?? "")")
+    }
+}
