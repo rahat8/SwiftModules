@@ -1,0 +1,71 @@
+import Foundation
+
+enum APIError: Error {
+    case invalidURL
+    case networkError(Error)
+    case invalidResponse
+    case decodingError(Error)
+}
+
+class APIManager {
+    static let shared = APIManager() // Singleton instance
+
+    private let baseURL = "https://api.example.com"
+    private let session = URLSession.shared
+
+    private init() {} // Private initializer for singleton pattern
+
+    func fetchData(completion: @escaping (Result<Data, APIError>) -> Void) {
+        guard let url = URL(string: "\(baseURL)/data") else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        let task = session.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                completion(.failure(.networkError(error)))
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                completion(.failure(.invalidResponse))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(.invalidResponse))
+                return
+            }
+
+            completion(.success(data))
+        }
+
+        task.resume()
+    }
+
+    func parseData<T: Decodable>(_ data: Data, as type: T.Type) throws -> T {
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
+
+    func fetchDataAndParse<T: Decodable>(_ type: T.Type, completion: @escaping (Result<T, APIError>) -> Void) {
+        fetchData { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let parsedData = try self.parseData(data, as: type)
+                    completion(.success(parsedData))
+                } catch {
+                    completion(.failure(.decodingError(error)))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+}
