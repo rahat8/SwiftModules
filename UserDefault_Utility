@@ -1,1 +1,50 @@
+import Foundation
+
+class UserDefaultsManager {
+    // MARK: - Keys
+    enum Key: String {
+        case isLoggedIn
+        case username
+        // Add more keys as needed
+    }
+
+    // MARK: - Save and Retrieve Data
+    static func saveData(value: Any?, forKey key: Key) {
+        UserDefaults.standard.set(value, forKey: key.rawValue)
+    }
+
+    static func retrieveData(forKey key: Key) -> Any? {
+        return UserDefaults.standard.value(forKey: key.rawValue)
+    }
+
+    // MARK: - Retrieve Typed Data
+    static func retrieveTypedData<T>(forKey key: Key) -> T? {
+        return UserDefaults.standard.value(forKey: key.rawValue) as? T
+    }
+
+    // MARK: - Check If Key Exists
+    static func doesKeyExist(forKey key: Key) -> Bool {
+        return UserDefaults.standard.object(forKey: key.rawValue) != nil
+    }
+
+    // MARK: - Clear Data
+    static func clearData(forKey key: Key) {
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
+    }
+
+    static func clearAllData() {
+        if let bundleIdentifier = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
+        }
+    }
+
+    // MARK: - Default Values
+    static func retrieveDataWithDefault<T>(forKey key: Key, defaultValue: T) -> T {
+        if let value = UserDefaults.standard.value(forKey: key.rawValue) as? T {
+            return value
+        } else {
+            return defaultValue
+        }
+    }
+}
 
