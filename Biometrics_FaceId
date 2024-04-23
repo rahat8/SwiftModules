@@ -1,0 +1,30 @@
+import LocalAuthentication
+
+
+func authenticateWithFaceID() {
+    let context = LAContext()
+    var error: NSError?
+
+    // Check if the device supports biometric authentication (Face ID or Touch ID)
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+        let reason = "Authenticate to unlock your account"
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, evaluateError in
+            DispatchQueue.main.async {
+                if success {
+                    // Authentication successful
+                    print("Authentication successful")
+                } else {
+                    // Authentication failed
+                    if let error = evaluateError {
+                        print("Authentication failed: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    } else {
+        // Biometric authentication not available or supported
+        if let error = error {
+            print("Biometric authentication not available: \(error.localizedDescription)")
+        }
+    }
+}
