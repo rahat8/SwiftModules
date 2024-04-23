@@ -1,0 +1,37 @@
+import UIKit
+
+class LoginViewController: UIViewController {
+    @IBOutlet weak var usernameTextField: UITextField!
+    @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var errorLabel: UILabel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Additional setup code if needed
+    }
+
+    @IBAction func loginButtonTapped(_ sender: UIButton) {
+        guard let username = usernameTextField.text, !username.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty else {
+            showError(message: "Please enter both username/email and password.")
+            return
+        }
+
+        // Simulate authentication (replace with actual authentication logic)
+        if username == "exampleuser" && password == "password123" {
+            // Navigate to the next screen (e.g., HomeViewController)
+            // Replace "HomeViewController" with the actual name of your destination view controller
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let homeVC = storyboard.instantiateViewController(withIdentifier: "HomeViewController") as? HomeViewController {
+                navigationController?.pushViewController(homeVC, animated: true)
+            }
+        } else {
+            showError(message: "Invalid username/email or password.")
+        }
+    }
+
+    func showError(message: String) {
+        errorLabel.text = message
+        errorLabel.isHidden = false
+    }
+}
