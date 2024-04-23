@@ -1,0 +1,68 @@
+//   initial code setup
+
+Enable Sign In with Apple Capability:
+Open your Xcode project.
+Go to the "Signing & Capabilities" tab.
+Click the "+ Capability" button and add "Sign In with Apple."
+Import AuthenticationServices Framework:
+In your Swift file where you want to implement Apple Sign-In, import the AuthenticationServices framework.
+Add Apple Sign-In Button to Your UI:
+You can add the Apple Sign-In button either programmatically or using Interface Builder (storyboard/xib).
+For Interface Builder, drag and drop a "Sign In with Apple" button onto your view controller.
+Implement Apple Sign-In Delegates:
+Conform to ASAuthorizationControllerDelegate and ASAuthorizationControllerPresentationContextProviding protocols in your view controller.
+Implement the required delegate methods to handle the sign-in flow and authentication results.
+
+
+
+import UIKit
+import AuthenticationServices
+
+class ViewController: UIViewController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Create and add Apple Sign-In button to your view
+        let appleSignInButton = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+        appleSignInButton.addTarget(self, action: #selector(handleSignInWithApple), for: .touchUpInside)
+        view.addSubview(appleSignInButton)
+        
+        // Position the button on the view (example)
+        appleSignInButton.center = view.center
+    }
+
+    @objc func handleSignInWithApple() {
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+
+    // MARK: - ASAuthorizationControllerDelegate
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            // Handle user signed in with AppleIDCredential
+            let userIdentifier = appleIDCredential.user
+            let fullName = appleIDCredential.fullName
+            let email = appleIDCredential.email
+
+            print("User ID: \(userIdentifier)")
+            print("Full Name: \(fullName?.givenName ?? "") \(fullName?.familyName ?? "")")
+            print("Email: \(email ?? "")")
+        }
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        print("Apple Sign-In error: \(error.localizedDescription)")
+    }
+
+    // MARK: - ASAuthorizationControllerPresentationContextProviding
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+}
+
